@@ -6,3 +6,6 @@
 
 
 HW1: Design a basic neural network to train a model from 50,000 training images to discern objects in 10 categories.
+
+
+Lots of amazings to come...
