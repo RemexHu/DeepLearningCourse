@@ -27,6 +27,16 @@ class NeuralNetwork(object):
         self.reg_lambda = 0.001
         self.num_categories = 10
 
+        self.reg_coeff = 0.2
+
+        self.adam_beta1 = 0.9
+        self.adam_beta2 = 0.999
+        self.adam_epsilon = 1e-08
+        self.adam_wm = [0] * self.num_layers
+        self.adam_wv = [0] * self.num_layers
+        self.adam_bm = [0] * self.num_layers
+        self.adam_bv = [0] * self.num_layers
+
         # init parameters
 
     def affineForward(self, A, W, b):
@@ -46,7 +56,7 @@ class NeuralNetwork(object):
         Z = np.dot(W, A) + b_mod
 
         # Store vector b instead of b_mod
-        cache.update({'W':W, 'b':b, 'A': A, 'Z': Z })
+        cache.update({'W': W, 'b': b, 'A': A, 'Z': Z })
 
         return Z, cache
 
@@ -79,6 +89,11 @@ class NeuralNetwork(object):
             M is dropout mask, used in the backward pass
         """
 
+        M = np.random.rand(A.shape[0], A.shape[1])
+        M = 1.0 * (M > prob)
+        M /= (1 - prob)
+        A *= M
+
         return A, M
 
     def softmax(self, A):
@@ -109,8 +124,10 @@ class NeuralNetwork(object):
         for layer in range(self.num_layers - 1):
             Z, cache = self.affineForward(A, self.parameters[layer]['W'], self.parameters[layer]['b'])
             U = self.activationForward(Z, activation = 'relu')
+            last_A, M = self.dropout(U, self.drop_prob)
+            cache.update({'M': M})
             cache_all.update( {layer: cache} )
-            A = U
+            A = last_A
 
         output_Z, cache = self.affineForward(A, self.parameters[self.num_layers - 1]['W'], self.parameters[self.num_layers - 1]['b'])
         AL = self.softmax(output_Z)
@@ -154,8 +171,8 @@ class NeuralNetwork(object):
                 W = self.parameters[layer]['W']
                 reg_cost += np.sum(W ** 2) / 2
 
-        reg_coeff = 0.20
-        reg_cost *= reg_coeff
+
+        reg_cost *= self.reg_coeff
 
         cost = Loss + reg_cost / batch_size
 
@@ -210,7 +227,9 @@ class NeuralNetwork(object):
 
     def dropout_backward(self, dA, cache):
 
+        M = cache['M']
 
+        dA = dA * M
 
         return dA
 
@@ -235,7 +254,8 @@ class NeuralNetwork(object):
 
         for layer in range(self.num_layers - 2, -1, -1):
             dZ = self.activationBackward(dA_prev, cache[layer], activation="relu")
-            dA, dW, db = self.affineBackward(dZ, cache[layer])
+            dU = self.dropout_backward(dZ, cache[layer])
+            dA, dW, db = self.affineBackward(dU, cache[layer])
             gradients.update({layer: {'W': dW, 'b': db}})
 
             dA_prev = dA
@@ -250,9 +270,25 @@ class NeuralNetwork(object):
         """
         # we are not updating params layer by layer, instead, we have the gradients of all layers and update them at one time
 
+        # we implement Adam Optimizer
+
         for layer in range(self.num_layers):
-            self.parameters[layer]['W'] -= alpha * gradients[layer]['W']
-            self.parameters[layer]['b'] -= alpha * gradients[layer]['b']
+            dW, db = gradients[layer]['W'], alpha * gradients[layer]['b']
+            wm, wv = self.adam_wm[layer], self.adam_wv[layer]
+            bm, bv = self.adam_bm[layer], self.adam_bv[layer]
+
+            wm = self.adam_beta1 * wm + (1 - self.adam_beta1) * dW
+            wv = self.adam_beta2 * wv + (1 - self.adam_beta2) * (dW ** 2)
+            bm = self.adam_beta1 * bm + (1 - self.adam_beta1) * db
+            bv = self.adam_beta2 * bv + (1 - self.adam_beta2) * (db ** 2)
+
+            # store all four prams
+            self.adam_wm[layer], self.adam_wv[layer] = wm, wv
+            self.adam_bm[layer], self.adam_bv[layer] = bm, bv
+
+            # update param W and b
+            self.parameters[layer]['W'] -= alpha * wm / (np.sqrt(wv) + self.adam_epsilon)
+            self.parameters[layer]['b'] -= alpha * bm / (np.sqrt(bv) + self.adam_epsilon)
 
 
 
