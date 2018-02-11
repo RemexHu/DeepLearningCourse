@@ -302,6 +302,7 @@ class NeuralNetwork(object):
         :param print_every: no. of iterations to print debug info after
         """
 
+
         for cur_epoch in range(epoch):
 
             X_batch, y_batch = self.get_batch(X, y, batch_size)
@@ -347,9 +348,14 @@ class NeuralNetwork(object):
 
         X_batch, y_batch = [], []
 
+        # Shuffle training set
+        perm = np.random.permutation(num_example)
+
+        X_train, y_train = X[:, perm], y[perm]
+
         for i in range(0, num_example, batch_size):
-            X_batch_i = X[:, i : i + batch_size]
-            y_batch_i = y[i: i + batch_size]
+            X_batch_i = X_train[:, i : i + batch_size]
+            y_batch_i = y_train[i: i + batch_size]
 
             X_batch.append(X_batch_i)
             y_batch.append(y_batch_i)
