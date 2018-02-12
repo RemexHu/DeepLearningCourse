@@ -332,16 +332,18 @@ class NeuralNetwork(object):
 
                 if i % print_every == 0: print('{}/{} Epoch {}th Iters: Cost = {} batch acc = {} best acc = {}'
                                                .format(cur_epoch + 1, epoch, i + 1, round(cost, 3), acc, best_acc))
-            if cur_epoch % 10 == 0:
+            if cur_epoch % 5 == 0:
                 self.SaveParams('model/')
+                print("Params Update Successful!")
             epoch_elapse = time.clock() - start_epoch
 
             print('=============================================================================')
             print('                     {}th Epoch training time: {}s'.format(cur_epoch + 1, round(epoch_elapse, 2)))
             print('=============================================================================')
 
+            estimate_time = (epoch - cur_epoch) /3600 * epoch_elapse
             print('=============================================================================')
-            print('                     Estimated training time: {}h'.format(round((epoch - cur_epoch) * epoch_elapse / 3600), 4))
+            print('                     Estimated training time: {}h'.format(round(estimate_time, 4)))
             print('=============================================================================')
 
         self.SaveParams('model/')
@@ -619,18 +621,19 @@ def get_label(filepath, label2id):
         sys.exit("Invalid label: " + label)
 
 split_ratio = 0.05
-data_root_path = '/Users/runchenmac/Desktop/DEEPLEARNING/HW1/cifar10-hw1/'
+data_root_path = '/Users/RemMac/Documents/GitHub/DeepLearningCourse/HW1/cifar10-hw1/'
 X, y = get_train_data(data_root_path) # this may take a few minutes
 print('=============  Data loading done  ===========\n')
 
 X_train, X_test, y_train, y_test = DataSplit(X, y, split_ratio)
 
 
-layer_dimensions = [X_train.shape[0], 256, 10]
 
-layer_dimensions = [X_train.shape[0], 256, 256, 256, 256, 256, 256, 10]  # including the input and output layers
+
+layer_dimensions = [X_train.shape[0], 1024, 256, 10]# including the input and output layers
+
 NN = NeuralNetwork(layer_dimensions)
-NN.train(X_train, y_train, iters = 1000, epoch = 2, alpha = 0.001, batch_size = 100, print_every = 50)
+NN.train(X_train, y_train, iters = 1000, epoch = 500, alpha = 0.001, batch_size = 100, print_every = 20)
 
 y_predicted = NN.predict(X_test)
 save_predictions('ans1-uni', y_predicted)
