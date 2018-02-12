@@ -10,4 +10,4 @@ Needs to be added tomorrow.
 ### Feb 11 updates:
 Add Dropout, Batch shuffle, Testing part and changed into Adam Optimizor. It takes about 20 hours to finish training 500 epochs, but the acc is only around 50%. There mush be something wrong in the cost function.  
 
-Nedds to be further optimized.
+Needs to be further optimized.
