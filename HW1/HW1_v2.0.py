@@ -633,7 +633,7 @@ X_train, X_test, y_train, y_test = DataSplit(X, y, split_ratio)
 layer_dimensions = [X_train.shape[0], 1024, 256, 10]# including the input and output layers
 
 NN = NeuralNetwork(layer_dimensions)
-NN.train(X_train, y_train, iters = 1000, epoch = 500, alpha = 0.001, batch_size = 100, print_every = 20)
+NN.train(X_train, y_train, iters = 1000, epoch = 400, alpha = 0.001, batch_size = 100, print_every = 20)
 
 y_predicted = NN.predict(X_test)
 save_predictions('ans1-uni', y_predicted)
