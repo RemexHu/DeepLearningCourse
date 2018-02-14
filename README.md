@@ -10,7 +10,7 @@ Design a basic neural network to train a model from 50,000 training images to di
 #### Dataset and Method
 Dataset: CIFAR-10  
 Regularization: Dropout, L2-Reg  
-Optimizor: Adam
+Optimizor: Adam  
 Activation: ReLU
 
 
