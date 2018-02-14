@@ -15,7 +15,7 @@ Activation: ReLU
 
 
 #### Results:
-Successfully built up a three-layer dense neural network totally based on numpy. It takes 20 hours to train 500 epochs on CPU, and the performance is not that good (test acc is only around 50%).  
+Successfully built up a three-layer dense neural network totally based on numpy. It takes 20 hours to train 500 epochs on CPU, and the performance is not bad (test acc is about 53%).  
 
 ## HW2:
 #### Objective:
