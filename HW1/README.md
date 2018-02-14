@@ -8,6 +8,9 @@ The most basic and simplest neural network model with Gradient Descent Optimizer
 Needs to be added tomorrow.
 
 ### Feb 11 updates:
-Add Dropout, Batch shuffle, Testing part and changed into Adam Optimizor. It takes about 20 hours to finish training 500 epochs, but the acc is only around 50%. There mush be something wrong in the cost function.  
+Add Dropout, Batch shuffle, Testing part and changed into Adam Optimizor. It takes about 20 hours to finish training 500 epochs, but the acc is only around 50%. There could be something wrong in the cost function.  
 
 Needs to be further optimized.
+
+### Feb 14 updates:
+Test for 100 times using pre-trained model, the overall test acc is 53.1%, it's not bad.
