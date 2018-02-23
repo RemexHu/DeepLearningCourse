@@ -16,7 +16,8 @@ The result was amazing, the val_acc climbed to over 70% (72% at most) after 100 
 
 
 ### Feb 22 Update:
-It's a little bit confusing that my test result is extremly poor on kaggle test set (8% for the first time). I was thinking about using different preprocessing method like white noise, but it still doesn't work. (13% for the second time) So I double check the training data, the reason why it happening is because I used the wrong dataset! I used the Tensorflow-tutorial version of dataset with totally different labels.  
+It's a little bit confusing that my test result is extremly poor on kaggle test set (8% for the first time). I was thinking about using different preprocessing method like white noise, but it still doesn't work. (13% for the second time) So I double check the training data, the reason why it happening is because I used the wrong dataset! I used the Tensorflow-tutorial version of dataset with totally different labels. 
+
 I reloaded the data and retrained the networks, amazing things happened again. Perhaps the quality of this dataset is better than the tutorial version, the val_acc converged to over 85%.  
 
 
