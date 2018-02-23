@@ -1,6 +1,6 @@
 import tensorflow as tf
 import time
-import cifar
+import numpy as np
 
 
 class conv_layer(object):
@@ -59,7 +59,7 @@ class max_pooling_layer(object):
         return self.cell_out
 
 
-class norm_layer(object):
+class batch_norm_layer(object):
     def __init__(self, input_x):
         """
         :param input_x: The input that needed for normalization.
@@ -75,6 +75,19 @@ class norm_layer(object):
                                                  name=None)
             self.cell_out = cell_out
 
+    def output(self):
+        return self.cell_out
+
+class Local_Response_Norm_layer(object):
+    def __init__(self, input_x):
+        with tf.variable_scope('local_response_norm'):
+            cell_out = tf.nn.local_response_normalization(input_x,
+                                                          depth_radius=5,
+                                                          bias=1,
+                                                          alpha=1,
+                                                          beta=0.5,
+                                                          name=None)
+            self.cell_out = cell_out
     def output(self):
         return self.cell_out
 
@@ -117,10 +130,11 @@ class fc_layer(object):
         return self.cell_out
 
 
+
 def LeNet(input_x, input_y,
           img_len=24, channel_num=3, output_size=10,
-          conv_featmap=[32, 32, 64], fc_units=[512],
-          conv_kernel_size=[5, 5, 3], pooling_size=[2, 2, 2],
+          conv_featmap=[48, 48, 96, 96, 192, 192], fc_units=[512, 256],
+          conv_kernel_size=[3, 3, 3, 3, 3, 3], pooling_size=[2, 2, 2],
           l2_norm=0.01, seed=235):
     """
         LeNet is an early and famous CNN architecture for image classfication task.
@@ -139,7 +153,7 @@ def LeNet(input_x, input_y,
 
     """
 
-    assert len(conv_featmap) == len(conv_kernel_size) and len(conv_featmap) == len(pooling_size)
+    #assert len(conv_featmap) == len(conv_kernel_size) and len(conv_featmap) == len(pooling_size)
 
     # conv layer
     conv_layer_0 = conv_layer(input_x=input_x,
@@ -149,47 +163,87 @@ def LeNet(input_x, input_y,
                               rand_seed=seed,
                               index=0)
 
-    pooling_layer_0 = max_pooling_layer(input_x=conv_layer_0.output(),
-                                        k_size=pooling_size[0],
-                                        index=0,
-                                        padding="SAME")
-
-    dropout_0 = tf.nn.dropout(pooling_layer_0.output(), keep_prob=0.5)
-
-    # conv layer
-    conv_layer_1 = conv_layer(input_x=dropout_0,
+    conv_layer_01 = conv_layer(input_x=conv_layer_0.output(),
                               in_channel=conv_featmap[0],
                               out_channel=conv_featmap[1],
                               kernel_shape=conv_kernel_size[1],
                               rand_seed=seed,
                               index=1)
 
-    pooling_layer_1 = max_pooling_layer(input_x=conv_layer_1.output(),
-                                        k_size=pooling_size[1],
-                                        index=1,
+
+    pooling_layer_0 = max_pooling_layer(input_x=conv_layer_01.output(),
+                                        k_size=pooling_size[0],
+                                        index=0,
                                         padding="SAME")
 
-    dropout_1 = tf.nn.dropout(pooling_layer_1.output(), keep_prob=0.5)
+    dropout_0 = tf.nn.dropout(pooling_layer_0.output(), keep_prob=0.25)
 
-    # conv layer
-    conv_layer_2 = conv_layer(input_x=dropout_1,
+    batch_norm_layer_0 = batch_norm_layer(input_x=dropout_0)
+
+
+    #LRN_layer_0 = Local_Response_Norm_layer(input_x=pooling_layer_0.output())
+
+
+
+    #conv layer
+    conv_layer_1 = conv_layer(input_x=batch_norm_layer_0.output(),
                               in_channel=conv_featmap[1],
                               out_channel=conv_featmap[2],
                               kernel_shape=conv_kernel_size[2],
                               rand_seed=seed,
                               index=2)
 
-    pooling_layer_2 = max_pooling_layer(input_x=conv_layer_2.output(),
+    conv_layer_11 = conv_layer(input_x=conv_layer_1.output(),
+                              in_channel=conv_featmap[2],
+                              out_channel=conv_featmap[3],
+                              kernel_shape=conv_kernel_size[3],
+                              rand_seed=seed,
+                              index=3)
+
+    pooling_layer_1 = max_pooling_layer(input_x=conv_layer_11.output(),
+                                        k_size=pooling_size[1],
+                                        index=1,
+                                        padding="SAME")
+
+    #LRN_layer_1 = Local_Response_Norm_layer(input_x=pooling_layer_1.output())
+
+    #dropout_1 = tf.nn.dropout(pooling_layer_1.output(), keep_prob=0.25)
+
+    batch_norm_layer_1 = batch_norm_layer(input_x=pooling_layer_1.output())
+
+    # conv layer
+    conv_layer_2 = conv_layer(input_x=batch_norm_layer_1.output(),
+                              in_channel=conv_featmap[3],
+                              out_channel=conv_featmap[4],
+                              kernel_shape=conv_kernel_size[4],
+                              rand_seed=seed,
+                              index=4)
+
+    conv_layer_21 = conv_layer(input_x=conv_layer_2.output(),
+                              in_channel=conv_featmap[4],
+                              out_channel=conv_featmap[5],
+                              kernel_shape=conv_kernel_size[5],
+                              rand_seed=seed,
+                              index=5)
+
+
+    pooling_layer_2 = max_pooling_layer(input_x=conv_layer_21.output(),
                                         k_size=pooling_size[2],
                                         index=2,
                                         padding="SAME")
 
-    dropout_2 = tf.nn.dropout(pooling_layer_2.output(), keep_prob=0.5)
+    #LRN_layer_2 = Local_Response_Norm_layer(input_x=pooling_layer_2.output())
+
+    #dropout_2 = tf.nn.dropout(pooling_layer_2.output(), keep_prob=0.25)
+
+    batch_norm_layer_2 = batch_norm_layer(input_x=pooling_layer_2.output())
+
+
 
     # flatten
-    pool_shape = pooling_layer_2.output().get_shape()
+    pool_shape = batch_norm_layer_2.output().get_shape()
     img_vector_length = pool_shape[1].value * pool_shape[2].value * pool_shape[3].value
-    flatten = tf.reshape(dropout_2, shape=[-1, img_vector_length])
+    flatten = tf.reshape(batch_norm_layer_2.output(), shape=[-1, img_vector_length])
 
     # fc layer
     fc_layer_0 = fc_layer(input_x=flatten,
@@ -199,22 +253,34 @@ def LeNet(input_x, input_y,
                           activation_function=tf.nn.relu,
                           index=0)
 
+
     # dropout layer
     dropout_3 = tf.nn.dropout(fc_layer_0.output(), keep_prob=0.5)
 
+    batch_norm_layer_3 = batch_norm_layer(input_x=dropout_3)
+
+    fc_layer_1 = fc_layer(input_x=batch_norm_layer_3.output(),
+                          in_size=fc_units[0],
+                          out_size=fc_units[1],
+                          rand_seed=seed,
+                          activation_function=tf.nn.relu,
+                          index=1)
+    dropout_4 = tf.nn.dropout(fc_layer_1.output(), keep_prob=0.5)
+
+    batch_norm_layer_4 = batch_norm_layer(input_x=dropout_4)
 
     #fc layer
-    fc_layer_1 = fc_layer(input_x=dropout_3,
-                          in_size=fc_units[0],
+    fc_layer_2 = fc_layer(input_x=batch_norm_layer_4.output(),
+                          in_size=fc_units[1],
                           out_size=output_size,
                           rand_seed=seed,
                           activation_function=None,
-                          index=1)
+                          index=2)
 
 
     # saving the parameters for l2_norm loss
     conv_w = [conv_layer_0.weight]
-    fc_w = [fc_layer_0.weight, fc_layer_1.weight]
+    fc_w = [fc_layer_0.weight, fc_layer_2.weight]
 
     # loss
     with tf.name_scope("loss"):
@@ -223,13 +289,13 @@ def LeNet(input_x, input_y,
 
         label = tf.one_hot(input_y, 10)
         cross_entropy_loss = tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=fc_layer_1.output()),
+            tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=fc_layer_2.output()),
             name='cross_entropy')
         loss = tf.add(cross_entropy_loss, l2_norm * l2_loss, name='loss')
 
         tf.summary.scalar('LeNet_loss', loss)
 
-    return fc_layer_1.output(), loss
+    return fc_layer_2.output(), loss
 
 
 def cross_entropy(output, input_y):
@@ -240,9 +306,18 @@ def cross_entropy(output, input_y):
     return ce
 
 
-def train_step(loss, learning_rate=1e-3):
+def train_step(loss):
     with tf.name_scope('train_step'):
-        step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+        """
+        learning_rate = tf.train.exponential_decay(learning_rate,
+                                                   global_step=global_step,
+                                                   decay_steps=100,
+                                                   decay_rate=0.9,
+                                                   staircase=True)
+        """
+        #step = tf.train.AdamOptimizer(0.0009).minimize(loss)
+        step = tf.train.AdamOptimizer(0.0008).minimize(loss)
+        #tf.summary.scalar('learning_rate', loss)
 
     return step
 
@@ -255,17 +330,20 @@ def evaluate(output, input_y):
     return error_num
 
 
+
+
+
 # training function for the LeNet model
 def training(X_train, y_train, X_val, y_val,
-             conv_featmap=[32, 32, 64],
-             fc_units=[512],
-             conv_kernel_size=[5, 5, 3],
+             conv_featmap=[48, 48, 96, 96, 192, 192],
+             fc_units=[512, 256],
+             conv_kernel_size=[3, 3, 3, 3, 3, 3],
              pooling_size=[2, 2, 2],
              l2_norm=0.01,
              seed=235,
-             learning_rate=1e-3,
+             learning_rate=0.001,
              epoch=2000,
-             batch_size=128,
+             batch_size=100,
              verbose=False,
              pre_trained_model=None):
     print("Building my LeNet. Parameters: ")
@@ -283,7 +361,7 @@ def training(X_train, y_train, X_val, y_val,
         ys = tf.placeholder(shape=[None, ], dtype=tf.int64)
 
     output, loss = LeNet(xs, ys,
-                         img_len=24,
+                         img_len=32,
                          channel_num=3,
                          output_size=10,
                          conv_featmap=conv_featmap,
@@ -296,6 +374,8 @@ def training(X_train, y_train, X_val, y_val,
     iters = int(X_train.shape[0] / batch_size)
     print('number of batches for training: {}'.format(iters))
 
+
+
     step = train_step(loss)
     eve = evaluate(output, ys)
 
@@ -307,7 +387,7 @@ def training(X_train, y_train, X_val, y_val,
     with tf.Session() as sess:
         merge = tf.summary.merge_all()
 
-        writer = tf.summary.FileWriter(dir + "log/{}".format(cur_model_name), sess.graph)
+        writer = tf.summary.FileWriter("log/{}".format(cur_model_name), sess.graph)
         saver = tf.train.Saver()
         sess.run(tf.global_variables_initializer())
 
@@ -315,13 +395,19 @@ def training(X_train, y_train, X_val, y_val,
         if pre_trained_model is not None:
             try:
                 print("Load the model from: {}".format(pre_trained_model))
-                saver.restore(sess, dir + 'model/{}'.format(pre_trained_model))
+                saver.restore(sess, 'model/{}'.format(pre_trained_model))
             except Exception:
                 print("Load model Failed!")
                 pass
 
         for epc in range(epoch):
             print("epoch {} ".format(epc + 1))
+
+
+            perm = np.random.permutation(X_train.shape[0])
+            X_train = X_train[perm, :, :, :]
+            y_train = y_train[perm]
+
 
             for itr in range(iters):
                 iter_total += 1
@@ -351,6 +437,7 @@ def training(X_train, y_train, X_val, y_val,
                         print('Best validation accuracy! iteration:{} accuracy: {}%'.format(iter_total, valid_acc))
                         best_acc = valid_acc
                         saver.save(sess, 'model/{}'.format(cur_model_name))
+
 
 
     print("Traning ends. The best valid accuracy is {}. Model named {}.".format(best_acc, cur_model_name))
