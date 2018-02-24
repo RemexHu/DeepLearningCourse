@@ -67,10 +67,10 @@ training(X_train_total, y_train_total, X_val, y_val,
              l2_norm=0.01,
              seed=235,
              learning_rate=0.0005,
-             epoch=2000,
+             epoch=20,
              batch_size=100,
              verbose=False,
-             pre_trained_model=None)
+             pre_trained_model='runchennet_1519449479')
 
 
 #1519279787

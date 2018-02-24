@@ -131,27 +131,12 @@ class fc_layer(object):
 
 
 
-def LeNet(input_x, input_y,
+def RunchenNet(input_x, input_y,
           img_len=24, channel_num=3, output_size=10,
           conv_featmap=[48, 48, 96, 96, 192, 192], fc_units=[512, 256],
           conv_kernel_size=[3, 3, 3, 3, 3, 3], pooling_size=[2, 2, 2],
           l2_norm=0.01, seed=235):
-    """
-        LeNet is an early and famous CNN architecture for image classfication task.
-        It is proposed by Yann LeCun. Here we use its architecture as the startpoint
-        for your CNN practice. Its architecture is as follow.
 
-        input >> Conv2DLayer >> Conv2DLayer >> flatten >>
-        DenseLayer >> AffineLayer >> softmax loss >> output
-
-        Or
-
-        input >> [conv2d-maxpooling] >> [conv2d-maxpooling] >> flatten >>
-        DenseLayer >> AffineLayer >> softmax loss >> output
-
-        http://deeplearning.net/tutorial/lenet.html
-
-    """
 
     #assert len(conv_featmap) == len(conv_kernel_size) and len(conv_featmap) == len(pooling_size)
 
@@ -316,7 +301,7 @@ def train_step(loss):
                                                    staircase=True)
         """
         #step = tf.train.AdamOptimizer(0.0009).minimize(loss)
-        step = tf.train.AdamOptimizer(0.0008).minimize(loss)
+        step = tf.train.AdamOptimizer(0.00008).minimize(loss)
         #tf.summary.scalar('learning_rate', loss)
 
     return step
@@ -360,7 +345,7 @@ def training(X_train, y_train, X_val, y_val,
         xs = tf.placeholder(shape=[None, 32, 32, 3], dtype=tf.float32)
         ys = tf.placeholder(shape=[None, ], dtype=tf.int64)
 
-    output, loss = LeNet(xs, ys,
+    output, loss = RunchenNet(xs, ys,
                          img_len=32,
                          channel_num=3,
                          output_size=10,
@@ -382,7 +367,7 @@ def training(X_train, y_train, X_val, y_val,
     dir = "/home/runchen/Downloads/CNN_Tutorial/Tutorial/"
     iter_total = 0
     best_acc = 0
-    cur_model_name = 'lenet_{}'.format(int(time.time()))
+    cur_model_name = 'runchennet_{}'.format(int(time.time()))
 
     with tf.Session() as sess:
         merge = tf.summary.merge_all()

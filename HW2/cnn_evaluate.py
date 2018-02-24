@@ -69,10 +69,14 @@ def batch_test(X_test, batch_size = 500):
 kaggle_result = []
 
 for X_test_batch in X:
-    kaggle_result.append(predict(X_test_batch, "lenet_1519359862.meta"))
+    kaggle_result.append(predict(X_test_batch, "runchennet_1519449834.meta"))
 
 
 #kaggle_result = batch_test(X_test, 500)
+
+test_sheet = {0: 'airplane', 1:'automobile', 2: 'bird', 3: 'cat', 4: 'deer', 5: 'dog', 6: 'frog',
+       7: 'horse', 8: 'ship', 9: 'truck'}
+
 
 with open('predicted.csv','w',newline='') as csvfile:
     fieldnames = ['Id','label']
@@ -81,6 +85,9 @@ with open('predicted.csv','w',newline='') as csvfile:
     for index_0, result in enumerate(kaggle_result):
         for index_1,label in enumerate(result):
             filename = index_0 * 500 + index_1
+            writer.writerow({'Id': filename, 'label': test_sheet[label]})
+
+            """
             if label == 0: writer.writerow({'Id': filename, 'label': 'airplane'})
             elif label == 1: writer.writerow({'Id': filename, 'label': 'automobile'})
             elif label == 2: writer.writerow({'Id': filename, 'label': 'bird'})
@@ -91,7 +98,7 @@ with open('predicted.csv','w',newline='') as csvfile:
             elif label == 7: writer.writerow({'Id': filename, 'label': 'horse'})
             elif label == 8: writer.writerow({'Id': filename, 'label': 'ship'})
             elif label == 9: writer.writerow({'Id': filename, 'label': 'truck'})
-
+            """
 
 
 
