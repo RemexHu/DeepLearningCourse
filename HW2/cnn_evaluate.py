@@ -44,8 +44,6 @@ for i in range(10):
     X.append(X_test[i * 500: (i + 1) * 500])
 
 
-
-
 for X_test_batch in X:
 
     mean_image = np.mean(X_test_batch, axis=0)
@@ -53,7 +51,6 @@ for X_test_batch in X:
     X_test_batch /= np.std(X_test_batch, axis=0)
 
     X_test_batch = X_test_batch.reshape([-1,32,32,3])
-
 
 
 tf.reset_default_graph()
@@ -87,18 +84,6 @@ with open('predicted.csv','w',newline='') as csvfile:
             filename = index_0 * 500 + index_1
             writer.writerow({'Id': filename, 'label': test_sheet[label]})
 
-            """
-            if label == 0: writer.writerow({'Id': filename, 'label': 'airplane'})
-            elif label == 1: writer.writerow({'Id': filename, 'label': 'automobile'})
-            elif label == 2: writer.writerow({'Id': filename, 'label': 'bird'})
-            elif label == 3: writer.writerow({'Id': filename, 'label': 'cat'})
-            elif label == 4: writer.writerow({'Id': filename, 'label': 'deer'})
-            elif label == 5: writer.writerow({'Id': filename, 'label': 'dog'})
-            elif label == 6: writer.writerow({'Id': filename, 'label': 'frog'})
-            elif label == 7: writer.writerow({'Id': filename, 'label': 'horse'})
-            elif label == 8: writer.writerow({'Id': filename, 'label': 'ship'})
-            elif label == 9: writer.writerow({'Id': filename, 'label': 'truck'})
-            """
 
 
 
