@@ -27,7 +27,10 @@ Regularization: L2-norm, Batch-norm, Dropout
 Optimizor: Adam  
 Activation: ReLu  
 #### Results:  
-The final structure of my network is: conv -> conv -> batchnorm -> dropout -> conv -> conv -> batchnorm -> conv -> conv -> batchnorm -> flatten -> fc -> batchnorm -> dropout -> fc -> batchnorm -> dropout -> fc -> softmax.
+The final structure of my network is:   
+
+conv -> conv -> batchnorm -> dropout -> conv -> conv -> batchnorm -> conv -> conv -> batchnorm -> flatten -> fc -> batchnorm -> dropout -> fc -> batchnorm -> dropout -> fc -> softmax.  
+
 The final test acc on kaggle is 88%. The training process just takes about 90 mins, it's pretty efficient.   
 
 
