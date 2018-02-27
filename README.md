@@ -23,12 +23,12 @@ Lots of thanks to my friend @Yao_QiuColumbia
 Design a Convolutional Neural Network based on TensorFlow. The model is derivatived form 50,000 training images to classify objects in 10 categories.
 #### Dataset and Method:
 Dataset: CIFAR-10  
-Regularization: L2-norm  
+Regularization: L2-norm, Batch-norm, Dropout  
 Optimizor: Adam  
 Activation: ReLu  
 #### Results:  
-So far best val_acc is 61.8%.  
-Still working on it...  
+The final structure of my network is: conv -> conv -> batchnorm -> dropout -> conv -> conv -> batchnorm -> conv -> conv -> batchnorm -> flatten -> fc -> batchnorm -> dropout -> fc -> batchnorm -> dropout -> fc -> softmax.
+The final test acc on kaggle is 88%. The training process just takes about 90 mins, it's pretty efficient.   
 
 
 
